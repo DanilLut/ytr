@@ -41,14 +41,14 @@ ytr -h
 ## Configuration & Storage
 The application stores video entries in a JSON database located at:
 
-- **Linux/macOS**: `~/.config/ytr/db.json`
-- **Windows**: `%APPDATA%\ytr\db.json`
+- **Linux/macOS**: `~/.config/ytr/data.json`
+- **Windows**: `%APPDATA%\ytr\data.json`
 
 ## Dependencies
 This project uses the following Go libraries:
 - [Bubble Tea](https://github.com/charmbracelet/bubbletea) for the TUI
 - [Lip Gloss](https://github.com/charmbracelet/lipgloss) for styling
-- [Fatih Color](https://github.com/fatih/color) for colored output
+- [Color](https://github.com/fatih/color) for colored output
 
 ## License
 This project is licensed under the MIT License. See `LICENSE` for details.
