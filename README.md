@@ -14,6 +14,11 @@ ytr (YouTube Randomizer) is a simple terminal-based application for managing a c
 go install github.com/DanilLut/ytr@latest
 ```
 
+### Install wslu, if using WSL:
+```sh
+sudo apt install wslu
+```
+
 ## Usage
 
 Run the program with different options:
@@ -41,7 +46,7 @@ ytr -h
 ## Configuration & Storage
 The application stores video entries in a JSON database located at:
 
-- **Linux/macOS**: `~/.config/ytr/data.json`
+- **Linux/macOS/WSL**: `~/.config/ytr/data.json`
 - **Windows**: `%APPDATA%\ytr\data.json`
 
 ## Dependencies
