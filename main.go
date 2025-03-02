@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"runtime"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -517,7 +518,9 @@ func openURL(url string) {
 
 	switch {
 	case strings.Contains(url, "http"):
-		if _, err := exec.LookPath("xdg-open"); err == nil {
+		if isWSL() {
+			cmd = exec.Command("wslview", url) // WSL
+		} else if _, err := exec.LookPath("xdg-open"); err == nil {
 			cmd = exec.Command("xdg-open", url) // Linux
 		} else if _, err := exec.LookPath("open"); err == nil {
 			cmd = exec.Command("open", url) // macOS
@@ -534,3 +537,11 @@ func openURL(url string) {
 	}
 }
 
+func isWSL() bool {
+	if runtime.GOOS == "linux" {
+		if output, err := exec.Command("uname", "-r").Output(); err == nil {
+			return strings.Contains(string(output), "microsoft")
+		}
+	}
+	return false
+}

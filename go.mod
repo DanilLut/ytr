@@ -30,6 +30,4 @@ require (
 	golang.org/x/text v0.3.8 // indirect
 )
 
-retract (
-    v0.0.0-20250204160452-a95a6073a086 // Incorrect module path
-)
+retract v0.0.0-20250204160452-a95a6073a086 // Incorrect module path
