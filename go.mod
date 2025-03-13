@@ -1,4 +1,4 @@
-module github.com/DanilLut/ytr
+module github.com/DanilLut/ytr/v2
 
 go 1.23.5
 
