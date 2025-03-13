@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand"
-	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
