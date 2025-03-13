@@ -36,17 +36,22 @@ var (
 )
 
 type VideoEntry struct {
-	ID        string `json:"id"`
-	ShortID   string `json:"short_id"`
-	URL       string `json:"url"`
+	ID         string `json:"id"`
+	ShortID    string `json:"short_id"`
+	URL        string `json:"url"`
 	VideoTitle string `json:"title"`
-	Timestamp int64  `json:"timestamp"`
+	Author     string `json:"author"`
+	Duration   string `json:"duration"`
+	Timestamp  int64  `json:"timestamp"`
 }
 
 func (v VideoEntry) FilterValue() string { return v.VideoTitle }
 func (v VideoEntry) Title() string       { return v.VideoTitle }
 func (v VideoEntry) Description() string { 
-	return fmt.Sprintf("Added: %s", time.Unix(v.Timestamp, 0).Format("2006-01-02 15:04"))
+	return fmt.Sprintf("by %s • %s • Added: %s", 
+		v.Author, 
+		v.Duration, 
+		time.Unix(v.Timestamp, 0).Format("2006-01-02 15:04"))
 }
 
 
@@ -147,9 +152,11 @@ func runAddVideo(rawURL string) {
 		}
 	}
 
-	title, err := getYoutubeTitle(videoID)
+	title, author, duration, err := getVideoDetails(rawURL)
 	if err != nil {
 		title = rawURL
+		author = "Unknown"
+		duration = "Unknown"
 	}
 
 	entry := VideoEntry{
@@ -157,6 +164,8 @@ func runAddVideo(rawURL string) {
 		ShortID:    generateShortID(entries),
 		URL:        rawURL,
 		VideoTitle: title,
+		Author:     author,
+		Duration:   duration,
 		Timestamp:  time.Now().Unix(),
 	}
 
@@ -377,9 +386,11 @@ func (m *Model) processAddURL(rawURL string) tea.Cmd {
 			}
 		}
 
-		title, err := getYoutubeTitle(videoID)
+		title, author, duration, err := getVideoDetails(rawURL)
 		if err != nil {
 			title = rawURL
+			author = "Unknown"
+			duration = "Unknown"
 		}
 
 		entry := VideoEntry{
@@ -387,7 +398,9 @@ func (m *Model) processAddURL(rawURL string) tea.Cmd {
 			ShortID:   generateShortID(m.entries),
 			URL:       rawURL,
 			VideoTitle: title,
-			Timestamp: time.Now().Unix(),
+			Author:     author,
+			Duration:   duration,
+			Timestamp:  time.Now().Unix(),
 		}
 
 		return addVideoMsg{entry: entry}
@@ -417,29 +430,22 @@ func extractYoutubeID(rawURL string) (string, error) {
 	return "", fmt.Errorf("invalid YouTube URL")
 }
 
-func getYoutubeTitle(videoID string) (string, error) {
-	resp, err := http.Get(fmt.Sprintf(
-		"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=%s&format=json",
-		videoID,
-	))
+func getVideoDetails(rawURL string) (string, string, string, error) {
+	cmd := exec.Command("yt-dlp", "--print", "%(title)s", "--print", "%(uploader)s", "--print", "%(duration_string)s", "--no-playlist", rawURL)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
+		return "", "", "", fmt.Errorf("yt-dlp error: %v", err)
 	}
 
-	var result struct {
-		Title string `json:"title"`
-	}
-	if err := json.Unmarshal(body, &result); err != nil {
-		return "", err
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	if len(lines) < 3 {
+		return "", "", "", fmt.Errorf("insufficient data from yt-dlp")
 	}
 
-	return result.Title, nil
+	title := strings.TrimSpace(lines[0])
+	author := strings.TrimSpace(lines[1])
+	duration := strings.TrimSpace(lines[2])
+	return title, author, duration, nil
 }
 
 func generateShortID(entries []VideoEntry) string {
