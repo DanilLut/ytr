@@ -11,7 +11,8 @@ ytr (YouTube Randomizer) is a simple terminal-based application for managing a c
 ## Installation
 
 ```sh
-go install github.com/DanilLut/ytr@latest
+go install github.com/DanilLut/ytr/v2@latest
+pipx install yt-dlp
 ```
 
 ### Install wslu, if using WSL:

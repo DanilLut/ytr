@@ -32,5 +32,3 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 )
-
-retract v0.0.0-20250204160452-a95a6073a086 // Incorrect module path
